@@ -1,0 +1,47 @@
+import numpy as np
+import pandas as pd
+
+import requests
+from bs4 import BeautifulSoup
+
+# Identify the url
+
+URL = 'https://codegnan.com/'
+
+# Loading the webpage in memory using requests library
+page = requests.get(URL)
+
+# Check the status of the code page
+page.status_code
+
+# Extracting the HTML Code of the webpage
+
+htmlcode = page.text
+soup = BeautifulSoup(htmlcode)
+htmlcode
+
+content = soup.find('div', attrs={'class':'page-content'})
+text = content.text.split('\n')
+#print(text)
+
+data=text[text.index('⭐ Our certification  programs ')+2:text.index('Companies where  Our students got placed ')-1]
+vb=[i.strip() for i in data if i!='']
+munvar=[i for i in vb if i!='']
+#print(munvar)
+
+duration=[]
+course=[]
+description=[]
+location=[]
+for i in range(0,len(munvar),4):
+    duration.append(munvar[i])
+    course.append(munvar[i+1])
+    description.append(munvar[i+2])
+    location.append(munvar[i+3])
+
+df=pd.DataFrame({'Duration':duration,'Course':course,'Description':description,'Location':location})
+print(df)
+
+df.to_csv('certification.csv',index=False)
+from google.colab import files
+files.download('certification.csv')
